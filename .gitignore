@@ -5,6 +5,7 @@ package.json
 tags
 .idea
 /reinvent_scoring/configs/config.json
+.DS_Store
 
 dist
 build

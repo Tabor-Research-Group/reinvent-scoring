@@ -67,8 +67,30 @@ class BaseScoringFunction(ABC):
     def get_final_score_for_step(self, smiles: List[str], step: int) -> FinalSummary:
         molecules, valid_indices = self._chemistry.smiles_to_mols_and_indices(smiles)
         query_size = len(smiles)
-        summaries = [_update_total_score(sc.calculate_score_for_step(molecules, step), query_size, valid_indices) for sc
-                     in self.scoring_components]
+        #summaries = [_update_total_score(sc.calculate_score_for_step(molecules, step), query_size, valid_indices) for sc
+        #             in self.scoring_components]
+        summaries = list()
+        for sc in self.scoring_components:
+            if sc.__class__.__name__ not in ["RunJobs", "ExJobs","Triplets"]:
+                summaries.append(_update_total_score(sc.calculate_score_for_step(molecules, step), query_size, valid_indices))
+
+        for sc in self.scoring_components:
+            if sc.__class__.__name__ in ["RunJobs", "ExJobs"]:
+                #print("RunJobs")
+                for summary in summaries:
+                    #print('1', summary.total_score)
+                    for idx, score in enumerate(summary.total_score):
+                        if score == 0 and idx in valid_indices:
+                            molecule_idx = valid_indices.index(idx)
+                            valid_indices.remove(idx)
+                            molecules.pop(molecule_idx)
+                                                   
+                summaries.append(_update_total_score(sc.calculate_score_for_step(molecules, step), query_size, valid_indices))
+
+            elif sc.__class__.__name__ in ["Triplets"]:
+
+                summaries.append(_update_total_score(sc.calculate_score_for_step(molecules, step), query_size, valid_indices))
+
         return self._score_summary(summaries, smiles, valid_indices)
 
     def get_final_score(self, smiles: List[str]) -> FinalSummary:
@@ -111,6 +133,7 @@ class BaseScoringFunction(ABC):
 
     def _component_is_penalty(self, summary: ComponentSummary) -> bool:
         return (summary.parameters.component_type == self.component_enum.MATCHING_SUBSTRUCTURE) or (
+                summary.parameters.component_type == self.component_enum.MATCHING_SCAFFOLD) or (
                 summary.parameters.component_type == self.component_enum.CUSTOM_ALERTS)
 
     def _parallel_final_score(self, smiles: List[str]) -> FinalSummary:

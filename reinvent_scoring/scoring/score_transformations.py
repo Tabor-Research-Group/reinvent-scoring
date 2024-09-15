@@ -30,13 +30,21 @@ class TransformationFactory:
         return transformation_function
 
     def no_transformation(self, predictions: list, parameters: dict) -> np.array:
-        return np.array(predictions, dtype=np.float32)
-
+        def curation(value):
+            if value == None:
+                return 0
+            else:
+                return value
+        transformed = [curation(value) for value in predictions]
+        return np.array(transformed, dtype=np.float32)
+        
     def right_step(self, predictions, parameters) -> np.array:
         _low = parameters[TransformationParametersEnum.LOW]
 
         def _right_step_formula(value, low):
-            if value >= low:
+            if value == None:
+                return 0
+            elif value >= low:
                 return 1
             return 0
 
@@ -59,7 +67,9 @@ class TransformationFactory:
         _high = parameters[TransformationParametersEnum.HIGH]
 
         def _step_formula(value, low, high):
-            if low <= value <= high:
+            if value == None:
+                return 0
+            elif low <= value <= high:
                 return 1
             return 0
 
@@ -72,7 +82,10 @@ class TransformationFactory:
         _k = parameters[TransformationParametersEnum.K]
 
         def _exp(pred_val, low, high, k) -> float:
-            return math.pow(10, (10 * k * (pred_val - (low + high) * 0.5) / (low - high)))
+            try:
+                return math.pow(10, (10 * k * (pred_val - (low + high) * 0.5) / (low - high)))
+            except:
+                return 0
 
         transformed = [1 / (1 + _exp(pred_val, _low, _high, _k)) for pred_val in predictions]
         return np.array(transformed, dtype=np.float32)

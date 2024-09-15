@@ -4,18 +4,15 @@ from reinvent_scoring.scoring.component_parameters import ComponentParameters
 from reinvent_scoring.scoring.enums import ScoringFunctionComponentNameEnum
 from reinvent_scoring.scoring.score_components import BaseScoreComponent
 from reinvent_scoring.scoring.score_components import TanimotoSimilarity, \
-    JaccardDistance, CustomAlerts, QedScore, MatchingSubstructure, \
-    RocsSimilarity, ParallelRocsSimilarity, PredictivePropertyComponent, ChemPropComponent, SelectivityComponent, \
-    SASComponent, MolWeight, PSA, RotatableBonds, HBD_Lipinski, HBA_Lipinski, \
+    JaccardDistance, CustomAlerts, QedScore, MatchingSubstructure, MatchingScaffold,\
+    RocsSimilarity, ParallelRocsSimilarity, PredictivePropertyComponent, SelectivityComponent, \
+    SASComponent, MolWeight, PSA, RotatableBonds, ConsRotatableBonds, Binder, SCScore, SAScore, HBD_Lipinski, HBA_Lipinski, \
     NumRings, SlogP, AZdock, RatPKPiP, PiPLogPredictionComponent, PiPPredictionComponent, \
     QptunaPiPModelComponent, StringPiPPredictionComponent, GraphLength, NumberOfStereoCenters, \
     LinkerLengthRatio, LinkerGraphLength, LinkerEffectiveLength, LinkerNumRings, LinkerNumAliphaticRings, \
     LinkerNumAromaticRings, LinkerNumSPAtoms, LinkerNumSP2Atoms, LinkerNumSP3Atoms, LinkerNumHBA, \
     LinkerNumHBD, LinkerMolWeight, LinkerRatioRotatableBonds, DockStream, NumAromaticRings, NumAliphaticRings
-    
-from reinvent_scoring.scoring.score_components.rest.general_rest_component import GeneralRESTComponent
-   
-from reinvent_scoring.scoring.score_components.console_invoked import Icolos
+from reinvent_scoring.scoring.score_components.console_invoked import Icolos, RunJobs, ExJobs, Triplets
 
 
 class ScoreComponentFactory:
@@ -27,6 +24,7 @@ class ScoreComponentFactory:
         enum = ScoringFunctionComponentNameEnum()
         component_map = {
             enum.MATCHING_SUBSTRUCTURE: MatchingSubstructure,
+            enum.MATCHING_SCAFFOLD: MatchingScaffold,
             enum.ROCS_SIMILARITY: RocsSimilarity,
             enum.PREDICTIVE_PROPERTY: PredictivePropertyComponent,
             enum.CHEMPROP: ChemPropComponent,
@@ -37,6 +35,10 @@ class ScoreComponentFactory:
             enum.MOLECULAR_WEIGHT: MolWeight,
             enum.TPSA: PSA,
             enum.NUM_ROTATABLE_BONDS: RotatableBonds,
+            enum.CONS_ROTATABLE_BONDS: ConsRotatableBonds,
+            enum.BINDER: Binder,
+            enum.SCSCORE: SCScore,
+            enum.SASCORE: SAScore,
             enum.GRAPH_LENGTH: GraphLength,
             enum.NUM_HBD_LIPINSKI: HBD_Lipinski,
             enum.NUM_HBA_LIPINSKI: HBA_Lipinski,
@@ -77,6 +79,9 @@ class ScoreComponentFactory:
             enum.LINKER_RATIO_ROTATABLE_BONDS: LinkerRatioRotatableBonds,
             enum.DOCKSTREAM: DockStream,
             enum.ICOLOS: Icolos,
+            enum.RUNJOBS: RunJobs,
+            enum.EXJOBS: ExJobs,
+            enum.TRIPLETS: Triplets,
             # enum.AIZYNTH: BuildingBlockAvailabilityComponent
             enum.GENERAL_REST: GeneralRESTComponent
         }
